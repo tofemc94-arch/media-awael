@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>لوحة تحكم إعلام مدارس الأوائل الأهلية (مخصصة للمدير)</title>
+  
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+    body {
+      font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      body { background: white !important; color: black !important; font-size: 11pt; }
+    }
+    .print-only { display: none; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+  <!-- LOGIN OVERLAY SCREEN (Shown when not logged in as manager) -->
+  <div id="loginScreen" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in zoom-in duration-200">
+      
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black mx-auto shadow-md">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        </div>
+        <span class="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">منطقة مقيدة ومحمية</span>
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-1">تسجيل دخول مدير قسم الإعلام</h2>
+        <p class="text-xs text-slate-500">
+          هذه اللوحة خاصة بمدير القسم والمشرفين لمتابعة الحجوزات وإدارتها. المدارس لا يمكنها الدخول إلى هذه الشاشة.
+        </p>
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)" class="space-y-4 pt-2">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">كلمة مرور مدير القسم</label>
+          <div class="relative">
+            <input type="password" id="adminPasswordInput" required placeholder="أدخل كلمة المرور..." class="w-full px-4 py-3 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-600 outline-none font-mono">
+          </div>
+        </div>
+
+        <div id="loginAlertBox" class="hidden p-3 rounded-xl text-xs font-bold bg-rose-50 border border-rose-200 text-rose-800"></div>
+
+        <button type="submit" id="loginBtn" class="w-full py-3.5 px-4 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-black text-sm shadow-md transition flex items-center justify-center gap-2">
+          <span>دخول لوحة التحكم</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+
+        <div class="text-center pt-2">
+          <a href="/index.html" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition">
+            ← العودة إلى بوابة حجز المدارس
+          </a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Top Admin Navbar (Visible once authenticated) -->
+  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap justify-between items-center gap-3">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow-md">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-amber-400 tracking-wider">مجموعة مدارس الأوائل الأهلية</span>
+          <h1 class="text-base sm:text-lg font-black text-white leading-tight">لوحة تحكم مدير قسم الإعلام (خاصة)</h1>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="flex items-center gap-2">
+        <div id="liveBadge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs font-bold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>الإشعارات الحية نشطة</span>
+        </div>
+
+        <button onclick="testNotificationSound()" title="تجربة صوت التنبيه" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition border border-slate-700 flex items-center gap-1">
+          <span>🔔</span>
+          <span class="hidden sm:inline">صوت الإشعار</span>
+        </button>
+
+        <a href="/index.html" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center gap-1.5 border border-slate-700">
+          <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+          صفحة الحجز
+        </a>
+
+        <button onclick="window.print()" class="px-3.5 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-600 text-white text-xs font-black transition flex items-center gap-1.5 shadow">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          طباعة جدول اليوم
+        </button>
+
+        <button onclick="downloadCSV()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition border border-slate-700">
+          تصدير Excel
+        </button>
+
+        <!-- LOGOUT BUTTON -->
+        <button onclick="handleLogout()" title="تسجيل الخروج وقفل اللوحة" class="px-3 py-1.5 rounded-lg bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-black transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+          <span>خروج</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Toast Alert for New Bookings -->
+  <div id="liveToast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 hidden bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl border-2 border-amber-400 flex items-center gap-3 animate-in slide-in-from-top-4 duration-300">
+    <span class="text-2xl animate-bounce">📸</span>
+    <div>
+      <div class="text-xs font-bold text-amber-400">إشعار حجز فوري جديد!</div>
+      <div id="toastMessage" class="text-sm font-black text-white">--</div>
+    </div>
+    <button onclick="dismissToast()" class="text-slate-400 hover:text-white mr-2">✕</button>
+  </div>
+
+  <!-- Printable Header -->
+  <div class="print-only p-6 border-b-2 border-slate-900 mb-4">
+    <div class="flex justify-between items-center">
+      <div>
+        <h2 class="text-2xl font-black">مجموعة مدارس الأوائل الأهلية</h2>
+        <h3 class="text-lg font-bold text-slate-700">قسم الإعلام والتوثيق - جدول التكليفات والتغطيات اليومية</h3>
+      </div>
+      <div class="text-left font-bold text-sm">
+        <div>التاريخ: <span id="printDateLabel">--</span></div>
+        <div>دوام القسم: 08:00 ص - 01:00 م</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
+
+    <!-- KPI Stats Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 no-print">
+      
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-black">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 font-bold">حجوزات اليوم</div>
+          <div class="text-2xl font-black text-slate-800" id="statTodayCount">0</div>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 font-bold">إجمالي الحجوزات السارية</div>
+          <div class="text-2xl font-black text-slate-800" id="statActiveCount">0</div>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-black">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 font-bold">مدارس الأوائل</div>
+          <div class="text-2xl font-black text-slate-800">6 مدارس</div>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-black">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <div>
+          <div class="text-xs text-slate-500 font-bold">فترات محظورة (صيانة/قسم)</div>
+          <div class="text-2xl font-black text-slate-800" id="statBlockedCount">0</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-slate-200 no-print gap-2 overflow-x-auto">
+      <button onclick="switchTab('bookingsTab')" id="tabBtn-bookings" class="px-4 sm:px-5 py-3 font-black text-xs sm:text-sm border-b-2 border-blue-600 text-blue-600 transition flex items-center gap-1.5 shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        جدول التكليفات والحجوزات
+      </button>
+
+      <button onclick="switchTab('phoneAlertsTab')" id="tabBtn-phoneAlerts" class="px-4 sm:px-5 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 shrink-0">
+        <span>📱</span>
+        <span>إشعارات الهاتف وتليغرام</span>
+      </button>
+
+      <button onclick="switchTab('blockSlotTab')" id="tabBtn-blockSlot" class="px-4 sm:px-5 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 shrink-0">
+        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+        حظر وقت (صيانة)
+      </button>
+
+      <button onclick="switchTab('settingsTab')" id="tabBtn-settings" class="px-4 sm:px-5 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 shrink-0">
+        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+        إعدادات النظام والأمان
+      </button>
+    </div>
+
+    <!-- TAB 1: Bookings Schedule -->
+    <div id="bookingsTab" class="space-y-4">
+      
+      <!-- Filter Bar -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-3 no-print">
+        <div class="flex flex-wrap items-center gap-2">
+          
+          <button onclick="setDateFilter('all')" id="btnFilterAll" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-200 text-slate-800 transition">
+            كافة التواريخ
+          </button>
+          <button onclick="setDateFilter('today')" id="btnFilterToday" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-700 text-white transition">
+            اليوم فقط
+          </button>
+          <button onclick="setDateFilter('tomorrow')" id="btnFilterTomorrow" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+            غداً
+          </button>
+
+          <!-- Custom Date -->
+          <div class="flex items-center gap-1.5 pr-2 mr-2 border-r border-slate-200">
+            <span class="text-xs text-slate-500 font-bold">تاريخ محدد:</span>
+            <input type="date" id="filterDateInput" onchange="onCustomDateFilterChange()" class="px-2.5 py-1 text-xs rounded-lg border border-slate-300 font-bold">
+          </div>
+
+          <!-- School Filter -->
+          <div class="flex items-center gap-1.5 pr-2 mr-2 border-r border-slate-200">
+            <span class="text-xs text-slate-500 font-bold">المدرسة:</span>
+            <select id="filterSchoolSelect" onchange="loadBookings()" class="px-2.5 py-1 text-xs rounded-lg border border-slate-300 font-bold bg-white">
+              <option value="">جميع المدارس (6)</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div class="relative w-full sm:w-64">
+          <input type="text" id="searchInput" oninput="debounceSearch()" placeholder="بحث باسم المدرسة أو الفعالية..." class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-blue-600">
+          <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+      </div>
+
+      <!-- Bookings Table -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-2xs overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-right border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-xs font-black text-slate-600">
+                <th class="p-3.5">الموعد والفترة</th>
+                <th class="p-3.5">المدرسة</th>
+                <th class="p-3.5">نوع الفعالية والملاحظات</th>
+                <th class="p-3.5">المصور المكلف</th>
+                <th class="p-3.5">الحالة</th>
+                <th class="p-3.5 text-center no-print">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsTableBody" class="divide-y divide-slate-100 text-sm">
+              <tr>
+                <td colspan="6" class="p-8 text-center text-slate-400">جاري تحميل الحجوزات...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: Phone & Telegram Setup -->
+    <div id="phoneAlertsTab" class="hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+            <div class="w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center font-bold text-xl">
+              ✈️
+            </div>
+            <div>
+              <h3 class="font-black text-slate-900 text-base">إشعارات تليغرام الفورية على الهاتف</h3>
+              <p class="text-xs text-slate-500">تصلك رسالة فورية مع صوت تنبيه على هاتفك عند أي حجز جديد</p>
+            </div>
+          </div>
+
+          <form onsubmit="handleTelegramSettingsSave(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Telegram Bot Token</label>
+              <input type="text" id="tgBotTokenInput" placeholder="مثال: 7123456789:AAHxxxxx..." class="w-full px-3 py-2 text-xs font-mono rounded-xl border border-slate-300">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Telegram Chat ID (معرفك أو معرف القناة)</label>
+              <input type="text" id="tgChatIdInput" placeholder="مثال: 123456789" class="w-full px-3 py-2 text-xs font-mono rounded-xl border border-slate-300">
+            </div>
+
+            <div id="tgAlertBox" class="hidden p-3 rounded-xl text-xs font-bold"></div>
+
+            <div class="flex flex-wrap gap-2 pt-2">
+              <button type="submit" class="py-2.5 px-5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs shadow transition">
+                حفظ إعدادات تليغرام
+              </button>
+              <button type="button" onclick="testTelegramAlert()" class="py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow transition flex items-center gap-1.5">
+                <span>🔔</span>
+                <span>إرسال إشعار تجريبي للهاتف</span>
+              </button>
+            </div>
+          </form>
+
+          <div class="bg-sky-50/60 p-4 rounded-2xl border border-sky-100 text-xs text-slate-700 space-y-1.5">
+            <div class="font-bold text-sky-950">كيف تحصل على Bot Token و Chat ID خلال دقيقة واحدة؟</div>
+            <ol class="list-decimal list-inside space-y-1 text-slate-600 pr-1">
+              <li>ابحث في تليغرام عن <strong>@BotFather</strong> واضغط Start.</li>
+              <li>اكتب الأمر <code>/newbot</code> واختر اسماً للبوت، سيعطيك الـ <strong>API Token</strong> مباشرة.</li>
+              <li>ابحث عن بوت اسمه <strong>@userinfobot</strong> واضغط Start، سيعطيك الـ <strong>Chat ID</strong> الخاص بك فوراً!</li>
+              <li>الصقهما أعلاه واضغط حفظ؛ وستصلك إشعارات الحجز لحظة بلحظة.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xl">
+              💬
+            </div>
+            <div>
+              <h3 class="font-black text-slate-900 text-base">إشعارات الواتساب ورقم رئيس القسم</h3>
+              <p class="text-xs text-slate-500">لتوليد رسائل واتساب سريعة مباشرة لهاتفك عند تثبيت الموعد</p>
+            </div>
+          </div>
+
+          <form onsubmit="handleAdminPhoneSave(event)" class="space-y-3.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">رقم هاتف / واتساب رئيس قسم الإعلام</label>
+              <input type="tel" id="adminPhoneInput" placeholder="0770XXXXXXX" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 font-mono text-left" dir="ltr">
+              <p class="text-[11px] text-slate-400 mt-1">عند قيام أي مدرسة بالحجز، يظهر لها زر لإرسال تفاصيل الحجز مباشرة إلى هذا الرقم بنقرة واحدة.</p>
+            </div>
+
+            <div id="phoneAlertBox" class="hidden p-3 rounded-xl text-xs font-bold"></div>
+
+            <button type="submit" class="py-2.5 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow transition">
+              حفظ رقم الواتساب
+            </button>
+          </form>
+
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs text-slate-600 space-y-2">
+            <div class="font-bold text-slate-800">📱 تشغيل النظام في خلفية الهاتف (PWA)</div>
+            <p class="leading-relaxed">
+              إذا فتحت لوحة التحكم هذه من متصفح الهاتف (Safari على الآيفون أو Chrome على الأندرويد)، اضغط على <strong>"إضافة إلى الشاشة الرئيسية" (Add to Home Screen)</strong>. سيصبح لديك تطبيق مستقل في هاتفك يعمل في الخلفية ويطلق أصوات التنبيه مع كل حجز جديد!
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 3: Block Slot -->
+    <div id="blockSlotTab" class="hidden space-y-6">
+      
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm max-w-2xl">
+        <div class="border-b border-slate-100 pb-3 mb-4">
+          <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            قفل فترة زمنية وحظرها من الحجز
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">استخدم هذا النموذج لقفل وقت محدد لصالح صيانة المعدات أو التزام داخلي لقسم الإعلام لمنع حجزها.</p>
+        </div>
+
+        <form id="blockSlotForm" onsubmit="handleBlockSlotSubmit(event)" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">التاريخ المطلوب قفله <span class="text-rose-500">*</span></label>
+              <input type="date" id="blockDateInput" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 font-bold">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">الفترة الزمنية <span class="text-rose-500">*</span></label>
+              <select id="blockSlotSelect" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 bg-white font-bold">
+                <option value="09:00 - 10:00">09:00 ص - 10:00 ص</option>
+                <option value="10:00 - 11:00">10:00 ص - 11:00 ص</option>
+                <option value="11:00 - 12:00">11:00 ص - 12:00 م</option>
+                <option value="12:00 - 13:00">12:00 م - 01:00 م</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">السبب <span class="text-rose-500">*</span></label>
+            <input type="text" id="blockReasonInput" placeholder="مثال: صيانة الكاميرات أو اجتماع كادر القسم" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 font-medium">
+          </div>
+
+          <div id="blockAlert" class="hidden p-3 rounded-xl text-xs font-bold"></div>
+
+          <button type="submit" class="py-2.5 px-5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow transition">
+            قفل الفترة الزمنية في النظام
+          </button>
+        </form>
+      </div>
+
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <h3 class="text-sm font-black text-slate-900 mb-3">الفترات المحظورة في التاريخ المحدد</h3>
+        <div id="blockedSlotsList" class="space-y-2 text-sm"></div>
+      </div>
+
+    </div>
+
+    <!-- TAB 4: Settings & Security -->
+    <div id="settingsTab" class="hidden space-y-6">
+      
+      <!-- Security / Change Password Box -->
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm max-w-xl">
+        <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3 mb-4">
+          <span class="text-xl">🔐</span>
+          <div>
+            <h3 class="text-base font-black text-slate-900">أمان لوحة التحكم (تغيير كلمة المرور)</h3>
+            <p class="text-xs text-slate-500">قم بتغيير كلمة المرور الخاصة بك كمدير للقسم لمنع أي شخص آخر من الدخول</p>
+          </div>
+        </div>
+
+        <form onsubmit="handleChangePassword(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور الحالية</label>
+            <input type="password" id="currentPasswordInput" required class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور الجديدة</label>
+            <input type="password" id="newPasswordInput" required placeholder="أدخل كلمة مرور قوية..." class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 font-mono">
+          </div>
+
+          <div id="pwdAlertBox" class="hidden p-3 rounded-xl text-xs font-bold"></div>
+
+          <button type="submit" class="py-2.5 px-5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs shadow transition">
+            تحديث كلمة المرور
+          </button>
+        </form>
+      </div>
+
+      <!-- Schools Settings -->
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm max-w-4xl">
+        <h3 class="text-base font-black text-slate-900 border-b border-slate-100 pb-3 mb-4">
+          مدارس مجموعة الأوائل الست المعتمدة
+        </h3>
+        <form id="schoolsForm" onsubmit="handleSchoolsSubmit(event)" class="space-y-3">
+          <div id="schoolsInputsContainer" class="space-y-3"></div>
+          <div id="settingsAlert" class="hidden p-3 rounded-xl text-xs font-bold"></div>
+          <div class="pt-3">
+            <button type="submit" class="py-2.5 px-6 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs shadow transition">
+              حفظ التعديلات
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Edit Booking Modal -->
+  <div id="editBookingModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-black text-base text-slate-900">تحديث تفاصيل الحجز</h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+
+      <input type="hidden" id="editBookingId">
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">تعيين المصور المكلف بالتغطية</label>
+        <input type="text" id="editPhotographer" placeholder="مثال: المصور سيف / فريق التوثيق 1" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 font-bold">
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">حالة الحجز</label>
+        <select id="editStatus" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 bg-white font-bold">
+          <option value="مؤكد">مؤكد (ساري)</option>
+          <option value="تم الإنجاز">تم الإنجاز بنجاح 📷</option>
+          <option value="ملغي">ملغي ❌</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">الملاحظات</label>
+        <textarea id="editNotes" rows="2" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-300"></textarea>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="saveBookingEdit()" class="flex-1 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs shadow transition">
+          حفظ التغييرات
+        </button>
+        <button onclick="closeEditModal()" class="py-2.5 px-4 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs transition">
+          إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let adminToken = localStorage.getItem('alawael_admin_token') || null;
+
+    let adminData = {
+      settings: {},
+      schools: [],
+      bookings: [],
+      blockedSlots: [],
+      filter: {
+        dateType: 'today',
+        customDate: '',
+        schoolId: '',
+        search: ''
+      }
+    };
+
+    // Helper for authorized fetches
+    function authHeaders(extra = {}) {
+      const h = { ...extra };
+      if (adminToken) {
+        h['x-admin-token'] = adminToken;
+      }
+      return h;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      checkAuthAndInit();
+    });
+
+    async function checkAuthAndInit() {
+      if (!adminToken) {
+        showLoginScreen();
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin/verify', {
+          headers: authHeaders()
+        });
+        const data = await res.json();
+        if (data.authenticated) {
+          hideLoginScreen();
+          initAdminDashboard();
+        } else {
+          localStorage.removeItem('alawael_admin_token');
+          adminToken = null;
+          showLoginScreen();
+        }
+      } catch (e) {
+        showLoginScreen();
+      }
+    }
+
+    function showLoginScreen() {
+      document.getElementById('loginScreen').classList.remove('hidden');
+    }
+
+    function hideLoginScreen() {
+      document.getElementById('loginScreen').classList.add('hidden');
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const pwd = document.getElementById('adminPasswordInput').value;
+      const alertBox = document.getElementById('loginAlertBox');
+      alertBox.classList.add('hidden');
+
+      const loginBtn = document.getElementById('loginBtn');
+      loginBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pwd })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.token) {
+          adminToken = data.token;
+          localStorage.setItem('alawael_admin_token', adminToken);
+          hideLoginScreen();
+          initAdminDashboard();
+        } else {
+          alertBox.textContent = data.error || 'كلمة المرور غير صحيحة';
+          alertBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        alertBox.textContent = 'تعذر الاتصال بالخادم';
+        alertBox.classList.remove('hidden');
+      } finally {
+        loginBtn.disabled = false;
+      }
+    }
+
+    async function handleLogout() {
+      if (confirm('هل تريد تسجيل الخروج وقفل لوحة التحكم؟')) {
+        try {
+          await fetch('/api/admin/logout', {
+            method: 'POST',
+            headers: authHeaders()
+          });
+        } catch(e) {}
+        localStorage.removeItem('alawael_admin_token');
+        adminToken = null;
+        showLoginScreen();
+      }
+    }
+
+    function downloadCSV() {
+      if (!adminToken) return;
+      window.location.href = `/api/export/csv?token=${encodeURIComponent(adminToken)}`;
+    }
+
+    async function handleChangePassword(e) {
+      e.preventDefault();
+      const currentPassword = document.getElementById('currentPasswordInput').value;
+      const newPassword = document.getElementById('newPasswordInput').value;
+      const alertBox = document.getElementById('pwdAlertBox');
+
+      try {
+        const res = await fetch('/api/admin/change-password', {
+          method: 'POST',
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ currentPassword, newPassword })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          alertBox.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
+          alertBox.textContent = '✅ ' + data.message;
+          alertBox.classList.remove('hidden');
+          document.getElementById('currentPasswordInput').value = '';
+          document.getElementById('newPasswordInput').value = '';
+        } else {
+          alertBox.className = 'p-3 rounded-xl text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200';
+          alertBox.textContent = '❌ ' + (data.error || 'فشل التغيير');
+          alertBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        alertBox.textContent = 'تعذر الاتصال بالخادم';
+        alertBox.classList.remove('hidden');
+      }
+    }
+
+    function initAdminDashboard() {
+      const today = new Date();
+      const todayStr = formatDate(today);
+      document.getElementById('filterDateInput').value = todayStr;
+      document.getElementById('blockDateInput').value = todayStr;
+      document.getElementById('printDateLabel').textContent = todayStr;
+
+      loadBootstrap();
+      loadBookings();
+      setupSSE();
+    }
+
+    function formatDate(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function playChime() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, ctx.currentTime);
+        gain1.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start();
+        osc1.stop(ctx.currentTime + 0.6);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
+        gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.15);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.9);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(ctx.currentTime + 0.15);
+        osc2.stop(ctx.currentTime + 0.9);
+      } catch (e) {}
+    }
+
+    function testNotificationSound() {
+      playChime();
+      showToast('تجربة صوت التنبيه ناجحة! هكذا سيرن هاتفك مع كل حجز جديد.');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('liveToast');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => dismissToast(), 6000);
+    }
+
+    function dismissToast() {
+      document.getElementById('liveToast').classList.add('hidden');
+    }
+
+    function setupSSE() {
+      if (!('EventSource' in window)) return;
+      const evtSource = new EventSource('/api/events');
+
+      evtSource.addEventListener('connected', () => {
+        document.getElementById('liveBadge').classList.remove('hidden');
+      });
+
+      evtSource.addEventListener('NEW_BOOKING', (e) => {
+        const data = JSON.parse(e.data);
+        playChime();
+        showToast(data.message || 'حجز تصوير جديد تم تسجيله للتو!');
+        loadBookings();
+      });
+
+      evtSource.addEventListener('BOOKING_UPDATED', () => loadBookings());
+      evtSource.addEventListener('BOOKING_CANCELLED', () => loadBookings());
+      evtSource.addEventListener('SLOT_BLOCKED', () => loadBookings());
+    }
+
+    async function loadBootstrap() {
+      try {
+        const res = await fetch('/api/bootstrap');
+        const data = await res.json();
+        adminData.settings = data.settings || {};
+        adminData.schools = data.schools || [];
+
+        document.getElementById('tgBotTokenInput').value = adminData.settings.telegramBotToken || '';
+        document.getElementById('tgChatIdInput').value = adminData.settings.telegramChatId || '';
+        document.getElementById('adminPhoneInput').value = adminData.settings.adminPhone || '';
+
+        const sel = document.getElementById('filterSchoolSelect');
+        sel.innerHTML = '<option value="">جميع المدارس (6)</option>';
+        adminData.schools.forEach(sch => {
+          const opt = document.createElement('option');
+          opt.value = sch.id;
+          opt.textContent = sch.name;
+          sel.appendChild(opt);
+        });
+
+        populateSettingsSchools();
+      } catch (err) {
+        console.error('Bootstrap error:', err);
+      }
+    }
+
+    function populateSettingsSchools() {
+      const container = document.getElementById('schoolsInputsContainer');
+      container.innerHTML = '';
+      adminData.schools.forEach((sch, i) => {
+        const row = document.createElement('div');
+        row.className = 'p-3 rounded-2xl border border-slate-200 bg-slate-50 flex flex-wrap items-center gap-3';
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-4 h-4 rounded-full shadow-xs shrink-0" style="background-color: ${sch.colorHex}"></span>
+            <span class="text-xs font-bold text-slate-400">#${i + 1}</span>
+          </div>
+          <input type="text" data-school-id="${sch.id}" value="${sch.name}" class="flex-1 px-3 py-2 text-xs font-bold rounded-xl border border-slate-300 bg-white school-name-input">
+          <input type="text" data-school-id="${sch.id}" value="${sch.contact || ''}" placeholder="جهة الاتصال أو المسؤول" class="w-full sm:w-1/3 px-3 py-2 text-xs rounded-xl border border-slate-300 bg-white school-contact-input">
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    async function loadBookings() {
+      if (!adminToken) return;
+
+      const schoolId = document.getElementById('filterSchoolSelect').value;
+      const search = document.getElementById('searchInput').value.trim();
+
+      let dateQuery = '';
+      const today = new Date();
+      if (adminData.filter.dateType === 'today') {
+        dateQuery = formatDate(today);
+      } else if (adminData.filter.dateType === 'tomorrow') {
+        const tom = new Date();
+        tom.setDate(today.getDate() + 1);
+        dateQuery = formatDate(tom);
+      } else if (adminData.filter.dateType === 'custom') {
+        dateQuery = document.getElementById('filterDateInput').value;
+      }
+
+      let url = `/api/bookings?search=${encodeURIComponent(search)}`;
+      if (dateQuery) url += `&date=${dateQuery}`;
+      if (schoolId) url += `&schoolId=${schoolId}`;
+
+      try {
+        const res = await fetch(url, {
+          headers: authHeaders()
+        });
+
+        if (res.status === 401) {
+          showLoginScreen();
+          return;
+        }
+
+        const data = await res.json();
+        adminData.bookings = data.bookings || [];
+
+        renderBookingsTable();
+        updateStats();
+
+      } catch (err) {
+        console.error('Error loading bookings:', err);
+      }
+    }
+
+    function renderBookingsTable() {
+      const tbody = document.getElementById('bookingsTableBody');
+      tbody.innerHTML = '';
+
+      if (adminData.bookings.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="p-8 text-center text-slate-400 font-bold">
+              لا توجد حجوزات مسجلة مطابقة للفلتر المحدد
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      adminData.bookings.forEach(b => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+
+        let statusBadge = '';
+        if (b.status === 'تم الإنجاز') {
+          statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">تم الإنجاز 📷</span>';
+        } else if (b.status === 'ملغي') {
+          statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800">ملغي ❌</span>';
+        } else {
+          statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">مؤكد ✔️</span>';
+        }
+
+        const schHex = b.schoolColorHex || '#DC2626';
+        const badgeBg = b.badgeBg || '#FEE2E2';
+        const badgeText = b.badgeText || '#991B1B';
+
+        tr.innerHTML = `
+          <td class="p-3.5 font-bold text-slate-800">
+            <div class="text-xs text-blue-700 font-bold">${b.date}</div>
+            <div class="text-sm font-black mt-0.5 text-slate-900">${b.slot}</div>
+            <div class="text-[10px] text-slate-400 font-mono">#${b.id}</div>
+          </td>
+          <td class="p-3.5">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl font-black text-xs shadow-2xs" style="background-color: ${badgeBg}; color: ${badgeText}; border: 1px solid ${schHex}40">
+              <span class="w-3 h-3 rounded-full shrink-0 shadow-xs" style="background-color: ${schHex}"></span>
+              <span>${b.schoolName}</span>
+            </div>
+          </td>
+          <td class="p-3.5">
+            <div class="font-bold text-slate-900 text-xs sm:text-sm">${b.eventType}</div>
+            ${b.notes ? `<div class="text-xs text-slate-600 bg-slate-50 p-2 rounded-xl border border-slate-200 mt-1 font-medium leading-relaxed">${b.notes}</div>` : '<div class="text-[11px] text-slate-400 mt-0.5">بدون ملاحظات إضافية</div>'}
+          </td>
+          <td class="p-3.5">
+            <div class="text-xs font-bold text-slate-700 bg-slate-50 p-2 rounded-xl border border-slate-200">
+              ${b.photographer || 'لم يُعيّن بعد'}
+            </div>
+          </td>
+          <td class="p-3.5">
+            ${statusBadge}
+          </td>
+          <td class="p-3.5 text-center no-print">
+            <div class="flex items-center justify-center gap-1.5">
+              <button onclick="openEditModal('${b.id}')" title="تعديل وتعيين المصور" class="p-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 transition border border-slate-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+              </button>
+              <button onclick="cancelBooking('${b.id}')" title="إلغاء الحجز وإتاحة الوقت" class="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition border border-slate-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateStats() {
+      const todayStr = formatDate(new Date());
+      const todayBookings = adminData.bookings.filter(b => b.date === todayStr && b.status !== 'ملغي');
+      document.getElementById('statTodayCount').textContent = todayBookings.length;
+
+      const activeBookings = adminData.bookings.filter(b => b.status !== 'ملغي');
+      document.getElementById('statActiveCount').textContent = activeBookings.length;
+    }
+
+    function setDateFilter(type) {
+      adminData.filter.dateType = type;
+      
+      const btnAll = document.getElementById('btnFilterAll');
+      const btnToday = document.getElementById('btnFilterToday');
+      const btnTomorrow = document.getElementById('btnFilterTomorrow');
+
+      btnAll.className = 'px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200';
+      btnToday.className = 'px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200';
+      btnTomorrow.className = 'px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200';
+
+      if (type === 'all') btnAll.className = 'px-3 py-1.5 rounded-xl text-xs font-bold transition bg-blue-700 text-white';
+      if (type === 'today') btnToday.className = 'px-3 py-1.5 rounded-xl text-xs font-bold transition bg-blue-700 text-white';
+      if (type === 'tomorrow') btnTomorrow.className = 'px-3 py-1.5 rounded-xl text-xs font-bold transition bg-blue-700 text-white';
+
+      loadBookings();
+    }
+
+    function onCustomDateFilterChange() {
+      adminData.filter.dateType = 'custom';
+      document.getElementById('btnFilterAll').className = 'px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200';
+      document.getElementById('btnFilterToday').className = 'px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200';
+      document.getElementById('btnFilterTomorrow').className = 'px-3 py-1.5 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-700 hover:bg-slate-200';
+      loadBookings();
+    }
+
+    let searchTimeout;
+    function debounceSearch() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        loadBookings();
+      }, 300);
+    }
+
+    function switchTab(tabId) {
+      document.getElementById('bookingsTab').classList.add('hidden');
+      document.getElementById('phoneAlertsTab').classList.add('hidden');
+      document.getElementById('blockSlotTab').classList.add('hidden');
+      document.getElementById('settingsTab').classList.add('hidden');
+
+      document.getElementById('tabBtn-bookings').className = 'px-4 sm:px-5 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 shrink-0';
+      document.getElementById('tabBtn-phoneAlerts').className = 'px-4 sm:px-5 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 shrink-0';
+      document.getElementById('tabBtn-blockSlot').className = 'px-4 sm:px-5 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 shrink-0';
+      document.getElementById('tabBtn-settings').className = 'px-4 sm:px-5 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 shrink-0';
+
+      document.getElementById(tabId).classList.remove('hidden');
+
+      if (tabId === 'bookingsTab') {
+        document.getElementById('tabBtn-bookings').className = 'px-4 sm:px-5 py-3 font-black text-xs sm:text-sm border-b-2 border-blue-600 text-blue-600 transition flex items-center gap-1.5 shrink-0';
+      } else if (tabId === 'phoneAlertsTab') {
+        document.getElementById('tabBtn-phoneAlerts').className = 'px-4 sm:px-5 py-3 font-black text-xs sm:text-sm border-b-2 border-sky-600 text-sky-600 transition flex items-center gap-1.5 shrink-0';
+      } else if (tabId === 'blockSlotTab') {
+        document.getElementById('tabBtn-blockSlot').className = 'px-4 sm:px-5 py-3 font-black text-xs sm:text-sm border-b-2 border-amber-600 text-amber-600 transition flex items-center gap-1.5 shrink-0';
+        loadBlockedSlots();
+      } else if (tabId === 'settingsTab') {
+        document.getElementById('tabBtn-settings').className = 'px-4 sm:px-5 py-3 font-black text-xs sm:text-sm border-b-2 border-blue-600 text-blue-600 transition flex items-center gap-1.5 shrink-0';
+      }
+    }
+
+    async function handleTelegramSettingsSave(e) {
+      e.preventDefault();
+      const botToken = document.getElementById('tgBotTokenInput').value.trim();
+      const chatId = document.getElementById('tgChatIdInput').value.trim();
+      const alertBox = document.getElementById('tgAlertBox');
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'PUT',
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({
+            settings: { telegramBotToken: botToken, telegramChatId: chatId }
+          })
+        });
+
+        if (res.ok) {
+          alertBox.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
+          alertBox.textContent = 'تم حفظ إعدادات تليغرام بنجاح! يمكنك تجربة إرسال إشعار لهاتفك الآن.';
+          alertBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Error saving tg settings:', err);
+      }
+    }
+
+    async function testTelegramAlert() {
+      const botToken = document.getElementById('tgBotTokenInput').value.trim();
+      const chatId = document.getElementById('tgChatIdInput').value.trim();
+      const alertBox = document.getElementById('tgAlertBox');
+
+      if (!botToken || !chatId) {
+        alert('يرجى إدخال Token و Chat ID أولاً');
+        return;
+      }
+
+      alertBox.className = 'p-3 rounded-xl text-xs font-bold bg-sky-50 text-sky-800 border border-sky-200';
+      alertBox.textContent = 'جاري إرسال إشعار تجريبي إلى هاتفك...';
+      alertBox.classList.remove('hidden');
+
+      try {
+        const res = await fetch('/api/test-telegram', {
+          method: 'POST',
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ botToken, chatId })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          alertBox.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
+          alertBox.textContent = '✅ وصل الإشعار إلى هاتفك بنجاح!';
+        } else {
+          alertBox.className = 'p-3 rounded-xl text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200';
+          alertBox.textContent = '❌ فشل الإرسال: ' + (data.error || 'تأكد من صحة التوكن والمعرف');
+        }
+      } catch (err) {
+        alertBox.className = 'p-3 rounded-xl text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200';
+        alertBox.textContent = 'تعذر الاتصال بالخادم';
+      }
+    }
+
+    async function handleAdminPhoneSave(e) {
+      e.preventDefault();
+      const phone = document.getElementById('adminPhoneInput').value.trim();
+      const alertBox = document.getElementById('phoneAlertBox');
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'PUT',
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({
+            settings: { adminPhone: phone }
+          })
+        });
+
+        if (res.ok) {
+          alertBox.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
+          alertBox.textContent = 'تم حفظ رقم الواتساب بنجاح!';
+          alertBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Error saving admin phone:', err);
+      }
+    }
+
+    function openEditModal(bookingId) {
+      const b = adminData.bookings.find(item => item.id === bookingId);
+      if (!b) return;
+
+      document.getElementById('editBookingId').value = b.id;
+      document.getElementById('editPhotographer').value = b.photographer || '';
+      document.getElementById('editStatus').value = b.status || 'مؤكد';
+      document.getElementById('editNotes').value = b.notes || '';
+
+      document.getElementById('editBookingModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editBookingModal').classList.add('hidden');
+    }
+
+    async function saveBookingEdit() {
+      const id = document.getElementById('editBookingId').value;
+      const payload = {
+        photographer: document.getElementById('editPhotographer').value.trim(),
+        status: document.getElementById('editStatus').value,
+        notes: document.getElementById('editNotes').value.trim()
+      };
+
+      try {
+        const res = await fetch(`/api/bookings/${id}`, {
+          method: 'PUT',
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          closeEditModal();
+          loadBookings();
+        }
+      } catch (err) {
+        console.error('Error saving booking edit:', err);
+      }
+    }
+
+    async function cancelBooking(id) {
+      if (!confirm('هل تريد إلغاء هذا الحجز؟ سيصبح هذا الوقت متاحاً فوراً للمدارس الأخرى.')) return;
+      try {
+        const res = await fetch(`/api/bookings/${id}`, {
+          method: 'DELETE',
+          headers: authHeaders()
+        });
+        if (res.ok) loadBookings();
+      } catch (err) {
+        console.error('Error cancelling:', err);
+      }
+    }
+
+    async function handleBlockSlotSubmit(e) {
+      e.preventDefault();
+      const alertBox = document.getElementById('blockAlert');
+      alertBox.classList.add('hidden');
+
+      const payload = {
+        date: document.getElementById('blockDateInput').value,
+        slot: document.getElementById('blockSlotSelect').value,
+        reason: document.getElementById('blockReasonInput').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/block-slot', {
+          method: 'POST',
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          alertBox.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
+          alertBox.textContent = 'تم قفل الوقت بنجاح في النظام ولن تتمكن أي مدرسة من اختياره.';
+          alertBox.classList.remove('hidden');
+          document.getElementById('blockReasonInput').value = '';
+          loadBlockedSlots();
+        } else {
+          alertBox.className = 'p-3 rounded-xl text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200';
+          alertBox.textContent = data.error || 'فشل قفل الوقت';
+          alertBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Error blocking slot:', err);
+      }
+    }
+
+    async function loadBlockedSlots() {
+      const d = document.getElementById('blockDateInput').value;
+      try {
+        const res = await fetch(`/api/slots?date=${d}`);
+        const data = await res.json();
+        const container = document.getElementById('blockedSlotsList');
+        container.innerHTML = '';
+
+        const blocked = (data.slots || []).filter(s => s.status === 'blocked');
+        document.getElementById('statBlockedCount').textContent = blocked.length;
+
+        if (blocked.length === 0) {
+          container.innerHTML = '<p class="text-xs text-slate-400">لا توجد أوقات محظورة في هذا التاريخ المحدد</p>';
+          return;
+        }
+
+        blocked.forEach(b => {
+          const item = document.createElement('div');
+          item.className = 'p-3 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-between';
+          item.innerHTML = `
+            <div>
+              <div class="font-bold text-slate-900 text-xs">${b.label} (${d})</div>
+              <div class="text-xs text-amber-900 mt-0.5 font-medium">السبب: ${b.reason}</div>
+            </div>
+            <button onclick="unblockSlot('${b.blockId}')" class="px-3 py-1 rounded-xl bg-white hover:bg-rose-50 text-rose-600 text-xs font-bold border border-amber-200 shadow-xs transition">
+              فك الحظر وإتاحة الوقت
+            </button>
+          `;
+          container.appendChild(item);
+        });
+
+      } catch (err) {
+        console.error('Error loading blocked slots:', err);
+      }
+    }
+
+    async function unblockSlot(blockId) {
+      if (!confirm('هل تريد فك حظر هذه الفترة وإتاحتها مجدداً للمدارس؟')) return;
+      try {
+        const res = await fetch(`/api/block-slot/${blockId}`, {
+          method: 'DELETE',
+          headers: authHeaders()
+        });
+        if (res.ok) loadBlockedSlots();
+      } catch (err) {
+        console.error('Error unblocking slot:', err);
+      }
+    }
+
+    async function handleSchoolsSubmit(e) {
+      e.preventDefault();
+      const alertBox = document.getElementById('settingsAlert');
+      alertBox.classList.add('hidden');
+
+      const nameInputs = document.querySelectorAll('.school-name-input');
+      const contactInputs = document.querySelectorAll('.school-contact-input');
+
+      const updatedSchools = adminData.schools.map((sch, idx) => {
+        return {
+          ...sch,
+          name: nameInputs[idx] ? nameInputs[idx].value.trim() : sch.name,
+          contact: contactInputs[idx] ? contactInputs[idx].value.trim() : sch.contact
+        };
+      });
+
+      try {
+        const res = await fetch('/api/schools', {
+          method: 'PUT',
+          headers: authHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ schools: updatedSchools })
+        });
+
+        if (res.ok) {
+          alertBox.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
+          alertBox.textContent = 'تم حفظ بيانات المدارس بنجاح!';
+          alertBox.classList.remove('hidden');
+          loadBootstrap();
+        }
+      } catch (err) {
+        console.error('Error saving schools:', err);
+      }
+    }
+  </script>
+</body>
+</html>

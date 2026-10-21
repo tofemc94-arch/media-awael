@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>حجز التغطيات الإعلامية - مجموعة مدارس الأوائل الأهلية</title>
+  
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="إعلام الأوائل">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+    body {
+      font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .slot-card {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .slot-card:hover:not(.disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+    }
+    .print-only { display: none; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-gradient-to-r from-blue-950 via-indigo-900 to-slate-900 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap justify-between items-center gap-3">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow-md border-2 border-amber-300">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <div>
+          <span class="text-[11px] font-bold tracking-wider text-amber-300 uppercase">مجموعة مدارس الأوائل الأهلية</span>
+          <h1 class="text-lg sm:text-xl font-black text-white leading-tight">قسم الإعلام والتوثيق - نظام حجز التصوير</h1>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <button id="pwaInstallBtn" onclick="installPWA()" class="hidden px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black shadow transition flex items-center gap-1.5 animate-bounce">
+          <span>📱</span>
+          <span>تثبيت التطبيق على هاتفك</span>
+        </button>
+
+        <a href="/admin.html" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-bold transition flex items-center gap-1.5 border border-white/20 shadow-sm">
+          <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+          لوحة تحكم القسم
+        </a>
+
+        <a href="/guide.html" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-medium transition flex items-center gap-1 border border-white/15">
+          دليل الاستخدام
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Schools Identity Bar -->
+  <section class="bg-white border-b border-slate-200 py-3 shadow-xs overflow-x-auto">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-2 min-w-max">
+      <span class="text-xs font-bold text-slate-500 shrink-0 ml-2">مدارس المجموعة المعتمدة:</span>
+      <div class="flex items-center gap-2" id="headerSchoolsPills">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Notice Banner: Working Hours & Lock Policy -->
+  <section class="bg-blue-50/80 border-b border-blue-100">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs sm:text-sm">
+        <div class="flex items-center gap-2.5 text-slate-700">
+          <span class="p-1.5 bg-blue-600 text-white rounded-lg shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </span>
+          <div>
+            الدوام الرسمي: <span class="font-bold text-blue-900">08:00 ص – 01:00 م</span> | فترات التصوير المتاحة: <span class="font-bold text-blue-900">09:00 ص – 01:00 م</span>
+            (فترة 8-9 ص مخصصة للتجهيز والانطلاق).
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-xl font-bold text-xs shadow-xs shrink-0">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>نظام الحماية من التكرار نشط: الوقت المحجوز يُقفل فوراً</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Booking Interface -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
+      
+      <!-- Right Side: The Booking Form -->
+      <div class="lg:col-span-2 space-y-6">
+        
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="p-5 sm:p-6 bg-gradient-to-l from-slate-50 to-white border-b border-slate-200 flex justify-between items-center">
+            <div>
+              <span class="text-xs font-black text-blue-700 tracking-wider">نموذج الحجز الموحد</span>
+              <h2 class="text-xl font-black text-slate-900 mt-0.5">طلب تغطية وتصوير فعالية مدرسية</h2>
+            </div>
+            <div class="text-xs bg-blue-50 text-blue-700 font-bold px-3 py-1 rounded-full border border-blue-200">
+              مدارس الأوائل الست
+            </div>
+          </div>
+
+          <form id="bookingForm" class="p-5 sm:p-6 space-y-6" onsubmit="handleBookingSubmit(event)">
+            
+            <!-- 1. School Selector -->
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-2">
+                1. اختر مدرستك من مدارس الأوائل <span class="text-rose-500">*</span>
+              </label>
+
+              <!-- Visual School Grid Cards -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-2" id="schoolGridOptions">
+                <!-- Rendered dynamically -->
+              </div>
+
+              <input type="hidden" id="schoolSelectInput" required>
+              <div id="schoolErrorText" class="text-xs text-rose-600 font-semibold mt-1 hidden">
+                يرجى اختيار المدرسة من الخيارات أعلاه.
+              </div>
+            </div>
+
+            <!-- 2. Date Selection -->
+            <div>
+              <label class="block text-sm font-bold text-slate-800 mb-2">
+                2. تاريخ الفعالية / التصوير <span class="text-rose-500">*</span>
+              </label>
+              
+              <div class="flex flex-wrap gap-2 mb-3" id="quickDateButtons">
+                <!-- Populated dynamically -->
+              </div>
+
+              <div class="relative">
+                <input type="date" id="dateInput" required onchange="onDateChange()" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 font-bold focus:ring-2 focus:ring-blue-600 outline-none transition">
+              </div>
+            </div>
+
+            <!-- 3. Time Slots Grid -->
+            <div>
+              <div class="flex justify-between items-center mb-2.5">
+                <label class="block text-sm font-bold text-slate-800">
+                  3. اختر الفترة الزمنية (من 9 صباحاً إلى 1 ظهراً) <span class="text-rose-500">*</span>
+                </label>
+                <span id="slotsLoadingBadge" class="hidden text-xs text-blue-600 font-bold animate-pulse">جاري فحص الحجوزات...</span>
+              </div>
+
+              <!-- Slots Container -->
+              <div id="slotsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="col-span-2 p-6 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                  يرجى تحديد التاريخ لعرض الفترات المتاحة والمحجوزة
+                </div>
+              </div>
+
+              <input type="hidden" id="selectedSlotInput" required>
+              <div id="slotErrorText" class="text-xs text-rose-600 font-semibold mt-1.5 hidden">
+                يرجى اختيار فترة زمنية متاحة للتصوير.
+              </div>
+            </div>
+
+            <!-- 4. ONLY Event Type & Notes (خلي بس نوع الفعالية والملاحظات) -->
+            <div class="pt-4 border-t border-slate-200 space-y-4">
+              <h3 class="text-sm font-black text-slate-800 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                4. تفاصيل الفعالية والملاحظات
+              </h3>
+
+              <div>
+                <label class="block font-bold text-slate-700 mb-1.5 text-xs sm:text-sm">
+                  نوع الفعالية / التصوير <span class="text-rose-500">*</span>
+                </label>
+                <select id="eventTypeSelect" required class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white font-bold text-sm focus:ring-2 focus:ring-blue-600 outline-none">
+                  <option value="حفل مدرسي وتكريم متفوقين">حفل مدرسي / تكريم متفوقين</option>
+                  <option value="تغطية درس تفاعلي أو نموذجي">درس تفاعلي أو نموذجي</option>
+                  <option value="نشاط رياضي أو كشفي">نشاط رياضي أو كشفي</option>
+                  <option value="معرض علمي أو فني أو بازار">معرض علمي أو فني أو بازار</option>
+                  <option value="توثيق زيارة وفد أو إشراف رسمي">توثيق زيارة وفد أو إشراف رسمي</option>
+                  <option value="تصوير شخصي أو هويات الطلبة">تصوير هويات أو صور تذكارية</option>
+                  <option value="تغطية إعلامية وتوثيق عام">تغطية إعلامية وتوثيق عام</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                  الملاحظات (اختياري)
+                </label>
+                <textarea id="notesInput" rows="3" placeholder="اكتب هنا أي ملاحظات أو تفاصيل إضافية تريد إعلام فريق التصوير بها..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-blue-600 outline-none"></textarea>
+              </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="bookingAlert" class="hidden p-4 rounded-2xl text-sm font-bold"></div>
+
+            <!-- Submit Button -->
+            <div class="pt-2">
+              <button type="submit" id="submitBtn" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 hover:from-blue-800 hover:to-indigo-900 text-white font-black text-base shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                <span>تثبيت حجز الموعد وقفله فوراً في النظام</span>
+              </button>
+              <p class="text-center text-xs text-slate-400 mt-2 font-medium">
+                بمجرد الحجز، يُقفل هذا الوقت وتصل إشعارات فورية لهاتف رئيس قسم الإعلام.
+              </p>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Left Side: Live Day Schedule & Schools Info -->
+      <div class="space-y-6">
+        
+        <!-- Live Status Card for Selected Date -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 class="font-black text-slate-900 text-sm flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+              جدول التغطيات لليوم المحدد
+            </h3>
+            <span id="summaryDateLabel" class="text-xs bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-lg">--</span>
+          </div>
+
+          <div class="mt-4 space-y-2.5" id="dayTimelineList">
+            <p class="text-xs text-slate-400 text-center py-4">حدد التاريخ لعرض المواعيد</p>
+          </div>
+        </div>
+
+        <!-- The 6 Schools Directory -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5">
+          <h3 class="font-black text-slate-900 text-sm mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            مدارس المجموعة المعتمدة (6 مدارس)
+          </h3>
+          <ul class="space-y-2 text-xs" id="schoolsColorList">
+            <!-- Populated dynamically -->
+          </ul>
+        </div>
+
+        <!-- Phone & Mobile Help Card -->
+        <div class="bg-gradient-to-br from-indigo-950 to-slate-900 text-white rounded-3xl p-5 shadow-sm space-y-3">
+          <div class="flex items-center gap-2 text-amber-400 font-black text-sm">
+            <span>📱</span>
+            <span>استخدام النظام على الهاتف</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            يعمل هذا الموقع كتطبيق ويب متطور (PWA) على هواتف آيفون وأندرويد. يمكنك إضافته للشاشة الرئيسية ليفتح كتطبيق كامل بدون شريط المتصفح ويعمل في الخلفية.
+          </p>
+          <div class="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+            <span>تحديثات حية للحجوزات</span>
+            <span class="text-emerald-400 font-bold">● متصل ومباشر</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Success Modal (Clean: Only School, Date, Slot, Event Type, Notes) -->
+  <div id="successModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-200">
+      
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-emerald-600 to-teal-700 p-6 text-white text-center">
+        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <h3 class="text-2xl font-black">تم تأكيد الحجز بنجاح!</h3>
+        <p class="text-emerald-100 text-xs sm:text-sm mt-1">تم قفل الموعد في نظام مدارس الأوائل الأهلية</p>
+      </div>
+
+      <!-- Printable & Displayable Receipt -->
+      <div class="p-6 space-y-3.5 text-xs sm:text-sm" id="printableReceipt">
+        <div class="flex justify-between items-center pb-2.5 border-b border-slate-100">
+          <span class="text-slate-500 font-bold">رقم الحجز:</span>
+          <span id="modalBookingId" class="font-mono font-black text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg">--</span>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <span class="text-slate-500 font-bold">المدرسة:</span>
+          <span id="modalSchoolNameBadge" class="font-black px-2.5 py-1 rounded-lg">--</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-500 font-bold">التاريخ:</span>
+          <span id="modalBookingDate" class="font-bold text-blue-900">--</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-500 font-bold">الوقت المحجوز:</span>
+          <span id="modalBookingSlot" class="font-black text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">--</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-500 font-bold">نوع الفعالية:</span>
+          <span id="modalEventType" class="font-bold text-slate-800">--</span>
+        </div>
+        <div id="modalNotesRow" class="hidden flex justify-between items-start">
+          <span class="text-slate-500 font-bold">الملاحظات:</span>
+          <span id="modalNotes" class="font-medium text-slate-700 text-right max-w-[70%]">--</span>
+        </div>
+
+        <div id="whatsAppSection" class="pt-2">
+          <a id="modalWhatsAppBtn" href="#" target="_blank" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2">
+            <span>💬</span>
+            <span>إرسال إشعار فوري لرئيس قسم الإعلام عبر واتساب</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Modal Actions -->
+      <div class="p-5 bg-slate-50 border-t border-slate-100 flex gap-3">
+        <button onclick="window.print()" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs transition flex items-center justify-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          طباعة الإيصال
+        </button>
+        <button onclick="closeModalAndReset()" class="flex-1 py-2.5 px-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs shadow transition">
+          حسناً، تم
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 no-print">
+    <div class="max-w-6xl mx-auto px-4 text-center text-xs text-slate-500 space-y-1.5">
+      <p class="font-bold text-slate-800">مجموعة مدارس الأوائل الأهلية - قسم الإعلام والتوثيق المركزي</p>
+      <p>نظام الحجز الإلكتروني الموحد لمنع تعارض مواعيد التصوير بين المدارس الست</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    let appData = {
+      settings: {},
+      schools: [],
+      currentSlots: []
+    };
+
+    let selectedSchoolId = null;
+    let selectedSlotId = null;
+    let deferredPrompt = null;
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW reg fail:', err));
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('pwaInstallBtn');
+      if (btn) btn.classList.remove('hidden');
+    });
+
+    function installPWA() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        deferredPrompt = null;
+        document.getElementById('pwaInstallBtn').classList.add('hidden');
+      });
+    }
+
+    function setupSSE() {
+      if (!('EventSource' in window)) return;
+      const evtSource = new EventSource('/api/events');
+      evtSource.addEventListener('NEW_BOOKING', () => onDateChange());
+      evtSource.addEventListener('BOOKING_CANCELLED', () => onDateChange());
+      evtSource.addEventListener('SLOT_BLOCKED', () => onDateChange());
+      evtSource.addEventListener('SLOT_UNBLOCKED', () => onDateChange());
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initApp();
+      setupSSE();
+    });
+
+    async function initApp() {
+      try {
+        const res = await fetch('/api/bootstrap');
+        const data = await res.json();
+        appData.settings = data.settings || {};
+        appData.schools = data.schools || [];
+
+        renderHeaderSchoolsPills();
+        renderSchoolGridOptions();
+        renderSchoolsDirectory();
+        setupDatePickers();
+
+      } catch (err) {
+        console.error('Failed to bootstrap:', err);
+      }
+    }
+
+    function renderHeaderSchoolsPills() {
+      const container = document.getElementById('headerSchoolsPills');
+      container.innerHTML = '';
+      appData.schools.forEach(sch => {
+        const pill = document.createElement('div');
+        pill.className = 'px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-2 border shadow-2xs shrink-0';
+        pill.style.backgroundColor = sch.badgeBg;
+        pill.style.color = sch.badgeText;
+        pill.style.borderColor = sch.colorHex + '40';
+        pill.innerHTML = `
+          <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${sch.colorHex}"></span>
+          <span>${sch.name}</span>
+        `;
+        container.appendChild(pill);
+      });
+    }
+
+    function renderSchoolGridOptions() {
+      const container = document.getElementById('schoolGridOptions');
+      container.innerHTML = '';
+      appData.schools.forEach(sch => {
+        const card = document.createElement('div');
+        card.className = 'school-option-card cursor-pointer p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-400 transition flex items-center justify-between gap-2 shadow-2xs';
+        card.id = `school-card-${sch.id}`;
+        card.onclick = () => selectSchool(sch.id);
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-4 h-4 rounded-full shrink-0 shadow-xs" style="background-color: ${sch.colorHex}"></span>
+            <div class="font-black text-slate-800 text-xs sm:text-sm">${sch.name}</div>
+          </div>
+          <span class="w-2 h-2 rounded-full" style="background-color: ${sch.colorHex}"></span>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function selectSchool(schoolId) {
+      selectedSchoolId = schoolId;
+      document.getElementById('schoolSelectInput').value = schoolId;
+      document.getElementById('schoolErrorText').classList.add('hidden');
+
+      const sch = appData.schools.find(s => s.id === schoolId);
+
+      document.querySelectorAll('.school-option-card').forEach(c => {
+        c.className = 'school-option-card cursor-pointer p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-400 transition flex items-center justify-between gap-2 shadow-2xs';
+        c.style.borderColor = '';
+        c.style.backgroundColor = '';
+      });
+
+      const selectedEl = document.getElementById(`school-card-${schoolId}`);
+      if (selectedEl && sch) {
+        selectedEl.style.borderColor = sch.colorHex;
+        selectedEl.style.backgroundColor = sch.badgeBg;
+      }
+    }
+
+    function renderSchoolsDirectory() {
+      const list = document.getElementById('schoolsColorList');
+      list.innerHTML = '';
+      appData.schools.forEach(sch => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between p-2.5 rounded-xl border border-slate-100 bg-slate-50 text-slate-800 font-bold';
+        li.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full shrink-0" style="background-color: ${sch.colorHex}"></span>
+            <span class="text-xs font-black">${sch.name}</span>
+          </div>
+          <span class="w-1.5 h-1.5 rounded-full" style="background-color: ${sch.colorHex}"></span>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function setupDatePickers() {
+      const today = new Date();
+      const todayStr = formatDateToISO(today);
+
+      const dateInput = document.getElementById('dateInput');
+      dateInput.min = todayStr;
+      dateInput.value = todayStr;
+
+      const quickContainer = document.getElementById('quickDateButtons');
+      quickContainer.innerHTML = '';
+
+      const options = [
+        { label: 'اليوم', offset: 0 },
+        { label: 'غداً', offset: 1 },
+        { label: 'بعد غد', offset: 2 }
+      ];
+
+      options.forEach((opt, idx) => {
+        const targetDate = new Date();
+        targetDate.setDate(today.getDate() + opt.offset);
+        const tStr = formatDateToISO(targetDate);
+        const dayName = targetDate.toLocaleDateString('ar-IQ', { weekday: 'long' });
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `px-3.5 py-1.5 rounded-xl text-xs font-bold transition border ${idx === 0 ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}`;
+        btn.textContent = `${opt.label} (${dayName})`;
+        btn.onclick = () => {
+          dateInput.value = tStr;
+          Array.from(quickContainer.children).forEach(c => {
+            c.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition border bg-white text-slate-700 border-slate-200 hover:bg-slate-100';
+          });
+          btn.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition border bg-blue-700 text-white border-blue-700';
+          onDateChange();
+        };
+        quickContainer.appendChild(btn);
+      });
+
+      onDateChange();
+    }
+
+    function formatDateToISO(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    async function onDateChange() {
+      const dateVal = document.getElementById('dateInput').value;
+      if (!dateVal) return;
+
+      selectedSlotId = null;
+      document.getElementById('selectedSlotInput').value = '';
+      document.getElementById('slotErrorText').classList.add('hidden');
+
+      const dateObj = new Date(dateVal + 'T00:00:00');
+      const dayArabic = dateObj.toLocaleDateString('ar-IQ', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('summaryDateLabel').textContent = dayArabic;
+
+      const badge = document.getElementById('slotsLoadingBadge');
+      badge.classList.remove('hidden');
+
+      try {
+        const res = await fetch(`/api/slots?date=${dateVal}`);
+        const data = await res.json();
+        appData.currentSlots = data.slots || [];
+        renderSlotsGrid(data);
+        renderDayTimeline(data);
+      } catch (err) {
+        console.error('Failed to load slots:', err);
+      } finally {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function renderSlotsGrid(data) {
+      const container = document.getElementById('slotsContainer');
+      container.innerHTML = '';
+
+      if (!data.slots || data.slots.length === 0) {
+        container.innerHTML = `<div class="col-span-2 p-4 text-center text-rose-500">لا توجد فترات تصوير لهذا اليوم</div>`;
+        return;
+      }
+
+      data.slots.forEach(slot => {
+        const card = document.createElement('div');
+        
+        if (slot.isAvailable) {
+          card.className = 'slot-card cursor-pointer p-4 rounded-2xl border-2 border-emerald-300 bg-emerald-50/50 hover:bg-emerald-100/60 hover:border-emerald-600 transition relative flex flex-col justify-between';
+          card.onclick = () => selectSlot(slot.id, card);
+          card.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-black px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                متاح للحجز
+              </span>
+              <span class="text-xs font-bold text-slate-500">60 دقيقة</span>
+            </div>
+            <div class="text-base font-black text-slate-900 mt-1">${slot.label}</div>
+            <div class="text-xs text-emerald-800 mt-2 font-bold flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              انقر لاختيار هذا الوقت
+            </div>
+          `;
+        } else if (slot.status === 'booked') {
+          const schHex = slot.schoolColorHex || '#DC2626';
+          const badgeBg = slot.badgeBg || '#FEE2E2';
+          const badgeText = slot.badgeText || '#991B1B';
+
+          card.className = 'slot-card disabled cursor-not-allowed p-4 rounded-2xl border-2 relative flex flex-col justify-between';
+          card.style.borderColor = schHex;
+          card.style.backgroundColor = badgeBg + '80';
+
+          card.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-black px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-2xs" style="background-color: ${badgeBg}; color: ${badgeText}; border: 1px solid ${schHex}40">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                محجوز ومقفل
+              </span>
+              <span class="w-3.5 h-3.5 rounded-full shadow-xs" style="background-color: ${schHex}"></span>
+            </div>
+            <div class="text-base font-black text-slate-800 line-through decoration-rose-500">${slot.label}</div>
+            <div class="mt-2 text-xs p-2.5 rounded-xl bg-white/90 border border-slate-200">
+              <div class="font-black text-slate-900 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${schHex}"></span>
+                ${slot.schoolName}
+              </div>
+              <div class="text-[11px] text-slate-500 truncate mt-0.5">${slot.eventType || ''}</div>
+            </div>
+          `;
+        } else if (slot.status === 'blocked') {
+          card.className = 'slot-card disabled opacity-80 cursor-not-allowed p-4 rounded-2xl border-2 border-amber-300 bg-amber-50/80 relative flex flex-col justify-between';
+          card.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900">
+                محظور من قسم الإعلام
+              </span>
+            </div>
+            <div class="text-base font-black text-slate-700">${slot.label}</div>
+            <div class="mt-2 text-xs text-amber-900 bg-white/80 p-2 rounded-xl">
+              ${slot.reason}
+            </div>
+          `;
+        }
+
+        container.appendChild(card);
+      });
+    }
+
+    function selectSlot(slotId, cardElem) {
+      selectedSlotId = slotId;
+      document.getElementById('selectedSlotInput').value = slotId;
+      document.getElementById('slotErrorText').classList.add('hidden');
+
+      const allCards = document.querySelectorAll('#slotsContainer .slot-card:not(.disabled)');
+      allCards.forEach(c => {
+        c.classList.remove('ring-4', 'ring-blue-600', 'border-blue-700', 'bg-blue-50');
+      });
+
+      cardElem.classList.add('ring-4', 'ring-blue-600', 'border-blue-700', 'bg-blue-50');
+    }
+
+    function renderDayTimeline(data) {
+      const container = document.getElementById('dayTimelineList');
+      container.innerHTML = '';
+
+      if (!data.slots) return;
+
+      data.slots.forEach(s => {
+        const row = document.createElement('div');
+        row.className = 'p-2.5 rounded-xl text-xs border flex items-center justify-between gap-2';
+
+        if (s.isAvailable) {
+          row.classList.add('bg-emerald-50/70', 'border-emerald-100', 'text-emerald-900');
+          row.innerHTML = `
+            <div class="font-bold flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              ${s.label}
+            </div>
+            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">متاح</span>
+          `;
+        } else if (s.status === 'booked') {
+          const schHex = s.schoolColorHex || '#DC2626';
+          row.className = 'p-2.5 rounded-xl text-xs border flex items-center justify-between gap-2';
+          row.style.backgroundColor = (s.badgeBg || '#FEE2E2') + '70';
+          row.style.borderColor = schHex + '40';
+
+          row.innerHTML = `
+            <div>
+              <div class="font-black text-slate-900 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full" style="background-color: ${schHex}"></span>
+                ${s.label}
+              </div>
+              <div class="text-[11px] font-bold mt-0.5" style="color: ${schHex}">${s.schoolName}</div>
+            </div>
+            <span class="px-2 py-0.5 rounded text-white font-bold shrink-0 text-[10px]" style="background-color: ${schHex}">
+              محجوز
+            </span>
+          `;
+        } else {
+          row.classList.add('bg-amber-50', 'border-amber-100', 'text-amber-950');
+          row.innerHTML = `
+            <div class="font-bold flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              ${s.label}
+            </div>
+            <span class="px-2 py-0.5 rounded bg-amber-200 text-amber-900 font-bold shrink-0">محظور</span>
+          `;
+        }
+
+        container.appendChild(row);
+      });
+    }
+
+    // Submit booking - ONLY School, Date, Slot, Event Type, Notes
+    async function handleBookingSubmit(event) {
+      event.preventDefault();
+      const alertBox = document.getElementById('bookingAlert');
+      alertBox.classList.add('hidden');
+
+      if (!selectedSchoolId) {
+        document.getElementById('schoolErrorText').classList.remove('hidden');
+        document.getElementById('schoolGridOptions').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      if (!selectedSlotId) {
+        document.getElementById('slotErrorText').classList.remove('hidden');
+        document.getElementById('slotsContainer').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      const payload = {
+        date: document.getElementById('dateInput').value,
+        slot: selectedSlotId,
+        schoolId: selectedSchoolId,
+        eventType: document.getElementById('eventTypeSelect').value,
+        notes: document.getElementById('notesInput').value.trim()
+      };
+
+      const submitBtn = document.getElementById('submitBtn');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg class="animate-spin w-5 h-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+        <span>جاري التحقق وقفل الوقت فوراً...</span>
+      `;
+
+      try {
+        const response = await fetch('/api/book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          alertBox.className = 'p-4 rounded-2xl text-sm font-bold bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-2';
+          alertBox.innerHTML = `
+            <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div>${result.error || 'حدث خطأ أثناء إتمام الحجز'}</div>
+          `;
+          alertBox.classList.remove('hidden');
+          onDateChange();
+          return;
+        }
+
+        showSuccessModal(result.booking, result.whatsAppUrl);
+
+      } catch (err) {
+        console.error('Booking error:', err);
+        alertBox.className = 'p-4 rounded-2xl text-sm font-bold bg-rose-50 border border-rose-200 text-rose-800';
+        alertBox.textContent = 'تعذر الاتصال بالخادم، يرجى المحاولة ثانية.';
+        alertBox.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    }
+
+    function showSuccessModal(booking, whatsAppUrl) {
+      document.getElementById('modalBookingId').textContent = booking.id;
+      
+      const schoolBadge = document.getElementById('modalSchoolNameBadge');
+      schoolBadge.textContent = booking.schoolName;
+      schoolBadge.style.backgroundColor = booking.badgeBg;
+      schoolBadge.style.color = booking.badgeText;
+      schoolBadge.style.border = `1px solid ${booking.schoolColorHex}`;
+
+      document.getElementById('modalBookingDate').textContent = booking.date;
+      document.getElementById('modalBookingSlot').textContent = booking.slot;
+      document.getElementById('modalEventType').textContent = booking.eventType;
+
+      const notesRow = document.getElementById('modalNotesRow');
+      if (booking.notes) {
+        document.getElementById('modalNotes').textContent = booking.notes;
+        notesRow.classList.remove('hidden');
+      } else {
+        notesRow.classList.add('hidden');
+      }
+
+      const waBtn = document.getElementById('modalWhatsAppBtn');
+      if (whatsAppUrl) {
+        waBtn.href = whatsAppUrl;
+        document.getElementById('whatsAppSection').classList.remove('hidden');
+      } else {
+        const waText = encodeURIComponent(`📸 حجز تصوير جديد - مدارس الأوائل\nالمدرسة: ${booking.schoolName}\nالوقت: ${booking.slot} (${booking.date})\nالفعالية: ${booking.eventType}` + (booking.notes ? `\nالملاحظات: ${booking.notes}` : ''));
+        waBtn.href = `https://wa.me/?text=${waText}`;
+      }
+
+      document.getElementById('successModal').classList.remove('hidden');
+    }
+
+    function closeModalAndReset() {
+      document.getElementById('successModal').classList.add('hidden');
+      document.getElementById('notesInput').value = '';
+      onDateChange();
+    }
+  </script>
+</body>
+</html>

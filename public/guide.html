@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دليل نظام حجز التصوير - مجموعة مدارس الأوائل الأهلية</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+    body {
+      font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black">
+          📚
+        </div>
+        <div>
+          <span class="text-[10px] text-amber-400 font-bold">مجموعة مدارس الأوائل الأهلية</span>
+          <h1 class="text-base sm:text-lg font-black">دليل تشغيل واستقبال إشعارات الهاتف</h1>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="/index.html" class="px-3 py-1.5 rounded-xl bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold transition">
+          بوابة الحجز
+        </a>
+        <a href="/admin.html" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition border border-slate-700">
+          لوحة التحكم
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-5xl mx-auto px-4 py-8 flex-1 space-y-8">
+
+    <!-- Top Card -->
+    <div class="bg-gradient-to-r from-blue-950 via-indigo-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl">
+      <span class="text-xs font-bold uppercase tracking-widest text-amber-300 bg-amber-400/20 px-3 py-1 rounded-full border border-amber-300/30">
+        مجموعة مدارس الأوائل الأهلية
+      </span>
+      <h2 class="text-2xl sm:text-3xl font-black mt-3">نظام الحجز الإلكتروني للتغطيات الإعلامية والتصوير</h2>
+      <p class="text-slate-200 text-xs sm:text-sm leading-relaxed mt-2 max-w-3xl">
+        تم تخصيص النظام لمدارس مجموعة الأوائل الست بألوانها الرسمية المعتمدة، مع ربطه بآلية منع تكرار الوقت المحجوز، وتفعيله كموقع ويب متكامل يعمل على الهاتف والكمبيوتر، ويرسل إشعارات فورية لهاتفك عند أي حجز جديد.
+      </p>
+    </div>
+
+    <!-- The 6 Schools with Colors -->
+    <section class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
+      <h3 class="text-lg font-black text-slate-900 flex items-center gap-2">
+        <span>🎨</span>
+        <span>المدارس الست وألوانها الرسمية المعتمدة في النظام</span>
+      </h3>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div class="p-3.5 rounded-2xl border-2 border-red-500 bg-red-50 flex items-center justify-between">
+          <div>
+            <div class="font-black text-slate-900 text-sm">ابتدائية الأوائل الأهلية</div>
+            <div class="text-xs text-red-700 font-bold">اللون المميز: أحمر</div>
+          </div>
+          <span class="w-6 h-6 rounded-full bg-red-600 shadow-sm"></span>
+        </div>
+
+        <div class="p-3.5 rounded-2xl border-2 border-amber-500 bg-amber-50 flex items-center justify-between">
+          <div>
+            <div class="font-black text-slate-900 text-sm">ثانوية الأوائل الأهلية للبنين</div>
+            <div class="text-xs text-amber-800 font-bold">اللون المميز: أصفر كموني</div>
+          </div>
+          <span class="w-6 h-6 rounded-full bg-amber-500 shadow-sm"></span>
+        </div>
+
+        <div class="p-3.5 rounded-2xl border-2 border-[#854D0E] bg-amber-900/10 flex items-center justify-between">
+          <div>
+            <div class="font-black text-slate-900 text-sm">ثانوية الأوائل الأهلية للبنات</div>
+            <div class="text-xs text-[#78350F] font-bold">اللون المميز: بني</div>
+          </div>
+          <span class="w-6 h-6 rounded-full bg-[#78350F] shadow-sm"></span>
+        </div>
+
+        <div class="p-3.5 rounded-2xl border-2 border-green-700 bg-green-50 flex items-center justify-between">
+          <div>
+            <div class="font-black text-slate-900 text-sm">ثانوية الأوائل المتميزين</div>
+            <div class="text-xs text-green-800 font-bold">اللون المميز: أخضر</div>
+          </div>
+          <span class="w-6 h-6 rounded-full bg-green-700 shadow-sm"></span>
+        </div>
+
+        <div class="p-3.5 rounded-2xl border-2 border-emerald-600 bg-emerald-50 flex items-center justify-between">
+          <div>
+            <div class="font-black text-slate-900 text-sm">ثانوية الأوائل المتميزات</div>
+            <div class="text-xs text-emerald-800 font-bold">اللون المميز: أخضر زمردي</div>
+          </div>
+          <span class="w-6 h-6 rounded-full bg-emerald-600 shadow-sm"></span>
+        </div>
+
+        <div class="p-3.5 rounded-2xl border-2 border-blue-600 bg-blue-50 flex items-center justify-between">
+          <div>
+            <div class="font-black text-slate-900 text-sm">مدرسة الأوائل البريطانية الدولية</div>
+            <div class="text-xs text-blue-800 font-bold">اللون المميز: أزرق</div>
+          </div>
+          <span class="w-6 h-6 rounded-full bg-blue-600 shadow-sm"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mobile App (PWA) & Background Execution -->
+    <section class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xl">
+          📱
+        </div>
+        <div>
+          <h3 class="text-lg font-black text-slate-900">كيف يفتح الموقع كتطبيق هاتف ويعمل في الخلفية؟</h3>
+          <p class="text-xs text-slate-500">تم تجهيز النظام بتقنية Progressive Web App (PWA) المعتمدة عالمياً</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-700">
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="font-bold text-slate-900 flex items-center gap-1.5">
+            <span>🍏</span>
+            <span>على هواتف الآيفون (iPhone / Safari):</span>
+          </div>
+          <ol class="list-decimal list-inside space-y-1 text-slate-600">
+            <li>افتح رابط الموقع في متصفح <strong>Safari</strong>.</li>
+            <li>اضغط على زر المشاركة (أيقونة المربع بسهم للأعلى في أسفل الشاشة).</li>
+            <li>اختر <strong>"إضافة إلى الشاشة الرئيسية" (Add to Home Screen)</strong>.</li>
+            <li>سيظهر تطبيق "إعلام الأوائل" على شاشة هاتفك بأيقونة احترافية، ويفتح في وضع ملء الشاشة بدون شريط المتصفح ويعمل في الخلفية!</li>
+          </ol>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="font-bold text-slate-900 flex items-center gap-1.5">
+            <span>🤖</span>
+            <span>على هواتف الأندرويد (Samsung / Xiaomi / Google):</span>
+          </div>
+          <ol class="list-decimal list-inside space-y-1 text-slate-600">
+            <li>افتح رابط الموقع في متصفح <strong>Chrome</strong>.</li>
+            <li>سيظهر لك زر باللون الأصفر في أعلى الشاشة: <strong>"تثبيت التطبيق على هاتفك"</strong> أو اضغط على خيارات المتصفح (ثلاث نقاط).</li>
+            <li>اختر <strong>"تثبيت التطبيق" (Install app)</strong>.</li>
+            <li>يتم تثبيت التطبيق مباشرة في قائمة تطبيقات هاتفك ويتلقى التحديثات والإشعارات فوراً.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- Phone Notifications Setup (Telegram & WhatsApp) -->
+    <section class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xl">
+          🔔
+        </div>
+        <div>
+          <h3 class="text-lg font-black text-slate-900">طريقة استقبال إشعارات الحجز على هاتفك لحظة بلحظة</h3>
+          <p class="text-xs text-slate-500">3 وسائل مجانية ومباشرة مدمجة في النظام</p>
+        </div>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm">
+        
+        <!-- Telegram Push -->
+        <div class="p-4 rounded-2xl bg-sky-50 border border-sky-100 space-y-2">
+          <div class="font-black text-sky-950 flex items-center gap-2">
+            <span>✈️</span>
+            <span>1. إشعارات تطبيق Telegram الفورية (مع صوت الرنين على الهاتف):</span>
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            تليغرام هو الخيار الأقوى والأسرع عالمياً لإرسال تنبيهات فورية مجانية لهاتفك على مدار الساعة:
+          </p>
+          <ul class="list-disc list-inside space-y-1 text-slate-600 pr-2">
+            <li>في لوحة التحكم ➔ تبويب <strong>"إشعارات الهاتف وتليغرام"</strong>، ضع الـ Bot Token والـ Chat ID.</li>
+            <li>بمجرد قيام أي مدرسة بحجز موعد، سيرن هاتفك وتصلك رسالة تفصيلية فورية باسم المدرسة، ولونها المميز، وموعد الفعالية، ومكانها، ورقم هاتف المنسق.</li>
+          </ul>
+        </div>
+
+        <!-- WhatsApp Click -->
+        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-100 space-y-2">
+          <div class="font-black text-emerald-950 flex items-center gap-2">
+            <span>💬</span>
+            <span>2. إشعار الواتساب التلقائي برقم رئيس القسم:</span>
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            عندما تكمل المدرسة الحجز، يظهر لها زر كبير باللون الأخضر: <strong>"إرسال إشعار فوري لرئيس قسم الإعلام عبر واتساب"</strong>. بمجرد الضغط عليه، يفتح تطبيق واتساب بهاتف منسق المدرسة ويرسل رسالة منسقة ومرتبة مباشرة إلى رقم رئيس القسم.
+          </p>
+        </div>
+
+        <!-- Dashboard Chime -->
+        <div class="p-4 rounded-2xl bg-amber-50 border border-amber-100 space-y-2">
+          <div class="font-black text-amber-950 flex items-center gap-2">
+            <span>🔊</span>
+            <span>3. صوت التنبيه اللحظي (Chime) والتحديث المباشر:</span>
+          </div>
+          <p class="text-slate-600 leading-relaxed">
+            طالما لوحة التحكم مفتوحة على جهاز كمبيوتر القسم أو هاتف المسؤول، يُطلق النظام صوت تنبيه مميز (Ding-Dong) وتظهر لافتة في أعلى الشاشة فوراً دون الحاجة لتحديث الصفحة!
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Permanent Hosting Guide -->
+    <section class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 space-y-3">
+      <h3 class="text-lg font-black text-amber-400">🌐 كيف ترفع هذا النظام برابط دائم على الإنترنت مجاناً؟</h3>
+      <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+        كافة ملفات هذا النظام محفوظة في مجلد المشروع (<code class="bg-white/10 px-1.5 py-0.5 rounded text-amber-300 font-mono">school-media-booking</code>). يمكنك رفعه خلال دقيقتين على:
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2">
+        <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+          <div class="font-bold text-white">منصة Render.com (مجانية تماماً)</div>
+          <p class="text-slate-300 mt-1">تنشئ حساباً مجانياً وتربط ملفات المشروع لتمنحك رابطاً رسمياً دائماً مثل: <code>alawael-media.onrender.com</code> ترسله للمدارس الست.</p>
+        </div>
+        <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+          <div class="font-bold text-white">أو على شبكة المدارس الداخلية</div>
+          <p class="text-slate-300 mt-1">يمكن تشغيله على كمبيوتر قسم الإعلام وربطه عبر شبكة Wi-Fi المشتركة لجميع مدارس المجمع.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+    مجموعة مدارس الأوائل الأهلية - قسم الإعلام والتوثيق المركزي
+  </footer>
+
+</body>
+</html>

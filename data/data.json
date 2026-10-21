@@ -1,0 +1,139 @@
+{
+  "settings": {
+    "groupName": "مجموعة مدارس الأوائل الأهلية",
+    "departmentName": "قسم الإعلام والتوثيق",
+    "workStartTime": "08:00",
+    "workEndTime": "13:00",
+    "bookingStartTime": "09:00",
+    "bookingEndTime": "13:00",
+    "slotDurationMinutes": 60,
+    "maxDaysAdvance": 30,
+    "instructions": "أهلاً بكم في بوابة حجز التغطيات الإعلامية والتصوير لمجموعة مدارس الأوائل الأهلية. يرجى اختيار مدرستك وتحديد موعد الفعالية بدقة قبل 24 ساعة، مع العلم أن أي وقت يتم حجزه يُقفل تلقائياً ولا يمكن لأي مدرسة أخرى اختياره.",
+    "adminPhone": "07700000000",
+    "telegramBotToken": "",
+    "telegramChatId": "",
+    "enableSoundAlerts": true,
+    "adminPassword": "alawael2026"
+  },
+  "schools": [
+    {
+      "id": "SCH-1",
+      "name": "ابتدائية الأوائل الأهلية",
+      "colorHex": "#DC2626",
+      "badgeBg": "#FEE2E2",
+      "badgeText": "#991B1B",
+      "contact": "إدارة الابتدائية"
+    },
+    {
+      "id": "SCH-2",
+      "name": "ثانوية الأوائل الأهلية للبنين",
+      "colorHex": "#D97706",
+      "badgeBg": "#FEF3C7",
+      "badgeText": "#92400E",
+      "contact": "إدارة ثانوية البنين"
+    },
+    {
+      "id": "SCH-3",
+      "name": "ثانوية الأوائل الأهلية للبنات",
+      "colorHex": "#78350F",
+      "badgeBg": "#F5EBE6",
+      "badgeText": "#78350F",
+      "contact": "إدارة ثانوية البنات"
+    },
+    {
+      "id": "SCH-4",
+      "name": "ثانوية الأوائل المتميزين",
+      "colorHex": "#15803D",
+      "badgeBg": "#DCFCE7",
+      "badgeText": "#166534",
+      "contact": "إدارة ثانوية المتميزين"
+    },
+    {
+      "id": "SCH-5",
+      "name": "ثانوية الأوائل المتميزات",
+      "colorHex": "#059669",
+      "badgeBg": "#D1FAE5",
+      "badgeText": "#065F46",
+      "contact": "إدارة ثانوية المتميزات"
+    },
+    {
+      "id": "SCH-6",
+      "name": "مدرسة الأوائل البريطانية الدولية",
+      "colorHex": "#1D4ED8",
+      "badgeBg": "#DBEAFE",
+      "badgeText": "#1E40AF",
+      "contact": "إدارة المدرسة الدولية"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "BK-101",
+      "date": "2026-10-21",
+      "slot": "09:00 - 10:00",
+      "slotStart": "09:00",
+      "slotEnd": "10:00",
+      "schoolId": "SCH-1",
+      "schoolName": "ابتدائية الأوائل الأهلية",
+      "schoolColorHex": "#DC2626",
+      "badgeBg": "#FEE2E2",
+      "badgeText": "#991B1B",
+      "eventType": "تغطية الطابور الصباحي وتكريم المتفوقين",
+      "notes": "نحتاج صور فوتوغرافية مع تصوير ريلز قصير",
+      "status": "مؤكد",
+      "photographer": "المصور سيف",
+      "createdAt": "2026-10-20T10:15:00Z"
+    },
+    {
+      "id": "BK-102",
+      "date": "2026-10-21",
+      "slot": "11:00 - 12:00",
+      "slotStart": "11:00",
+      "slotEnd": "12:00",
+      "schoolId": "SCH-4",
+      "schoolName": "ثانوية الأوائل المتميزين",
+      "schoolColorHex": "#15803D",
+      "badgeBg": "#DCFCE7",
+      "badgeText": "#166534",
+      "eventType": "توثيق تجارب معرض الروبوت والذكاء الاصطناعي",
+      "notes": "توثيق فيديو عالي الدقة وتصوير مقابلات سريعة مع الطلبة",
+      "status": "مؤكد",
+      "photographer": "فريق التوثيق (أحمد ومصطفى)",
+      "createdAt": "2026-10-20T12:00:00Z"
+    },
+    {
+      "id": "BK-103",
+      "date": "2026-10-22",
+      "slot": "10:00 - 11:00",
+      "slotStart": "10:00",
+      "slotEnd": "11:00",
+      "schoolId": "SCH-6",
+      "schoolName": "مدرسة الأوائل البريطانية الدولية",
+      "schoolColorHex": "#1D4ED8",
+      "badgeBg": "#DBEAFE",
+      "badgeText": "#1E40AF",
+      "eventType": "يوم الثقافات العالمي (International Day)",
+      "notes": "فعالية رئيسية بحضور الضيوف والأهالي، نحتاج تصوير احترافي شامل",
+      "status": "مؤكد",
+      "photographer": "فريق الإعلام المركزي",
+      "createdAt": "2026-10-21T08:30:00Z"
+    },
+    {
+      "id": "BK-361240",
+      "date": "2026-10-22",
+      "slot": "09:00 - 10:00",
+      "slotStart": "09:00",
+      "slotEnd": "10:00",
+      "schoolId": "SCH-2",
+      "schoolName": "ثانوية الأوائل الأهلية للبنين",
+      "schoolColorHex": "#D97706",
+      "badgeBg": "#FEF3C7",
+      "badgeText": "#92400E",
+      "eventType": "تغطية النشاط الرياضي والمباراة النهائية",
+      "notes": "التركيز على ركلات الترجيح",
+      "status": "مؤكد",
+      "photographer": "سيتم تعيين المصور من قبل القسم",
+      "createdAt": "2026-10-21T20:09:21.240Z"
+    }
+  ],
+  "blockedSlots": []
+}
